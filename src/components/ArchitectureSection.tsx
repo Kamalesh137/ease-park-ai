@@ -23,7 +23,7 @@ const ArchitectureSection = () => (
         <div className="bg-secondary/70 px-6 py-3 border-b flex items-center gap-2">
           <div className="flex gap-1.5">
             <span className="h-3 w-3 rounded-full bg-destructive/60" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400/60" />
+            <span className="h-3 w-3 rounded-full bg-accent/40" />
             <span className="h-3 w-3 rounded-full bg-accent/60" />
           </div>
           <span className="text-xs font-mono text-muted-foreground ml-2">AI_Parking_System/</span>
