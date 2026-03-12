@@ -1,5 +1,6 @@
 import { Car, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
@@ -20,7 +21,9 @@ const Navbar = () => {
               {l}
             </a>
           ))}
-          <Button size="sm">Get Started</Button>
+          <Link to="/dashboard">
+            <Button size="sm">Get Started</Button>
+          </Link>
         </div>
 
         <button className="md:hidden" onClick={() => setOpen(!open)}>
@@ -35,11 +38,12 @@ const Navbar = () => {
               {l}
             </a>
           ))}
-          <Button size="sm" className="w-full">Get Started</Button>
+          <Link to="/dashboard" onClick={() => setOpen(false)}>
+            <Button size="sm" className="w-full">Get Started</Button>
+          </Link>
         </div>
       )}
     </nav>
   );
-};
 
 export default Navbar;
