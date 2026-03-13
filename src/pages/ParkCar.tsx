@@ -1,17 +1,17 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, CarFront, MapPin, Navigation, CheckCircle2 } from "lucide-react";
+import { Camera, CarFront, MapPin, Navigation, CheckCircle2, TreeDeciduous } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
-  getCurrentUser, FLOORS, findAvailableSlot,
+  getCurrentUser, FLOORS,
   getOccupiedSlots, createSession, saveImage,
 } from "@/data/userStore";
 import { buildFloorGrid, findPath, type GridCell } from "@/lib/pathfinding";
+import { predictBestSlot } from "@/lib/randomForestSlotPredictor";
 import { cn } from "@/lib/utils";
 
 type Step = "floor" | "capture" | "navigate" | "done";
@@ -27,6 +27,7 @@ export default function ParkCar() {
   const [selectedFloor, setSelectedFloor] = useState<number>(1);
   const [assignedSlot, setAssignedSlot] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [predictionScore, setPredictionScore] = useState<number | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [grid, setGrid] = useState<GridCell[][] | null>(null);
   const [path, setPath] = useState<{ row: number; col: number }[]>([]);
@@ -44,14 +45,19 @@ export default function ParkCar() {
   });
 
   const handleSelectFloor = () => {
-    const slot = findAvailableSlot(selectedFloor);
-    if (!slot) {
+    const result = predictBestSlot(selectedFloor, {
+      vehicle_type: user!.vehicle_type,
+      car_length: user!.car_length,
+      car_width: user!.car_width,
+    });
+    if (!result) {
       toast({ title: "Floor full", description: "No available slots on this floor.", variant: "destructive" });
       return;
     }
-    setAssignedSlot(slot);
+    setAssignedSlot(result.slotId);
+    setPredictionScore(Math.round(result.score));
     setStep("capture");
-    toast({ title: "Slot assigned!", description: `Your slot: ${slot}` });
+    toast({ title: "🌲 Random Forest Prediction", description: `Best slot: ${result.slotId} (confidence: ${Math.round(result.score)}%)` });
   };
 
   // Camera
@@ -198,7 +204,7 @@ export default function ParkCar() {
                   </button>
                 ))}
               </div>
-              <Button onClick={handleSelectFloor} className="w-full gap-2"><CarFront className="h-4 w-4" />Assign Slot on {FLOORS.find((f) => f.floor === selectedFloor)?.label}</Button>
+              <Button onClick={handleSelectFloor} className="w-full gap-2"><TreeDeciduous className="h-4 w-4" />Predict Best Slot on {FLOORS.find((f) => f.floor === selectedFloor)?.label}</Button>
             </CardContent>
           </Card>
         )}
@@ -210,8 +216,11 @@ export default function ParkCar() {
               <CardTitle className="flex items-center gap-2 font-display"><Camera className="h-5 w-5 text-primary" />Capture Vehicle Image</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground flex items-center gap-3">
                 Assigned slot: <Badge variant="outline" className="ml-1">{assignedSlot}</Badge>
+                {predictionScore !== null && (
+                  <Badge className="bg-accent/20 text-accent-foreground gap-1"><TreeDeciduous className="h-3 w-3" />RF Score: {predictionScore}</Badge>
+                )}
               </div>
               <div className="relative bg-secondary rounded-xl overflow-hidden aspect-video flex items-center justify-center">
                 {capturedImage ? (

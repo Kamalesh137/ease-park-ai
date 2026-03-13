@@ -19,7 +19,8 @@ export default function MySessions() {
   useEffect(() => {
     if (!user) { navigate("/login"); return; }
     setSessions(getUserSessions(user.user_id).sort((a, b) => new Date(b.entry_time).getTime() - new Date(a.entry_time).getTime()));
-  }, [user, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.user_id, navigate]);
 
   const handleExit = (sessionId: string) => {
     endSession(sessionId);

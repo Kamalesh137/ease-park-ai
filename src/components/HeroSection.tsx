@@ -1,4 +1,5 @@
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import heroImg from "@/assets/hero-parking.jpg";
 
@@ -14,18 +15,17 @@ const HeroSection = () => (
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up" style={{ animationDelay: "0.1s" }}>
             Smart Parking with{" "}
-            <span className="text-gradient">Computer Vision</span>
+            <span className="text-gradient">Machine Learning</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            Real-time vehicle detection, automated slot tracking, and intelligent analytics — powered by YOLO and deep learning models.
+            Intelligent slot prediction, automated parking allocation, and smart analytics — powered by Random Forest ML and Dijkstra's navigation.
           </p>
           <div className="flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-            <Button size="lg" className="gap-2">
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              <Play className="h-4 w-4" /> Watch Demo
-            </Button>
+            <Link to="/register">
+              <Button size="lg" className="gap-2">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground animate-fade-up" style={{ animationDelay: "0.4s" }}>
             <span className="flex items-center gap-1.5"><span className="font-display font-bold text-2xl text-foreground">98%</span> Detection Accuracy</span>
