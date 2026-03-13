@@ -8,6 +8,11 @@ import Dashboard from "./pages/Dashboard.tsx";
 import VehicleLogs from "./pages/VehicleLogs.tsx";
 import Analytics from "./pages/Analytics.tsx";
 import SlotManagement from "./pages/SlotManagement.tsx";
+import Login from "./pages/Login.tsx";
+import Register from "./pages/Register.tsx";
+import ParkCar from "./pages/ParkCar.tsx";
+import MyAccount from "./pages/MyAccount.tsx";
+import MySessions from "./pages/MySessions.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -20,7 +25,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/park" element={<ParkCar />} />
+          <Route path="/my-account" element={<MyAccount />} />
+          <Route path="/my-sessions" element={<MySessions />} />
           <Route path="/logs" element={<VehicleLogs />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/management" element={<SlotManagement />} />
