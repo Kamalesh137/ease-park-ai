@@ -45,14 +45,19 @@ export default function ParkCar() {
   });
 
   const handleSelectFloor = () => {
-    const slot = findAvailableSlot(selectedFloor);
-    if (!slot) {
+    const result = predictBestSlot(selectedFloor, {
+      vehicle_type: user!.vehicle_type,
+      car_length: user!.car_length,
+      car_width: user!.car_width,
+    });
+    if (!result) {
       toast({ title: "Floor full", description: "No available slots on this floor.", variant: "destructive" });
       return;
     }
-    setAssignedSlot(slot);
+    setAssignedSlot(result.slotId);
+    setPredictionScore(Math.round(result.score));
     setStep("capture");
-    toast({ title: "Slot assigned!", description: `Your slot: ${slot}` });
+    toast({ title: "🌲 Random Forest Prediction", description: `Best slot: ${result.slotId} (confidence: ${Math.round(result.score)}%)` });
   };
 
   // Camera
