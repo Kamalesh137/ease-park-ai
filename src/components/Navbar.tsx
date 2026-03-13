@@ -2,18 +2,20 @@ import { Car, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { getCurrentUser } from "@/data/userStore";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
   const links = ["Features", "Architecture", "How It Works", "Contact"];
+  const user = getCurrentUser();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b">
       <div className="container flex items-center justify-between h-16">
-        <a href="#" className="flex items-center gap-2 font-display font-bold text-xl">
+        <Link to="/" className="flex items-center gap-2 font-display font-bold text-xl">
           <Car className="h-6 w-6 text-primary" />
           <span>ParkVision<span className="text-primary">AI</span></span>
-        </a>
+        </Link>
 
         <div className="hidden md:flex items-center gap-8">
           {links.map((l) => (
@@ -21,8 +23,8 @@ const Navbar = () => {
               {l}
             </a>
           ))}
-          <Link to="/dashboard">
-            <Button size="sm">Get Started</Button>
+          <Link to={user ? "/dashboard" : "/register"}>
+            <Button size="sm">{user ? "Dashboard" : "Get Started"}</Button>
           </Link>
         </div>
 
@@ -38,8 +40,8 @@ const Navbar = () => {
               {l}
             </a>
           ))}
-          <Link to="/dashboard" onClick={() => setOpen(false)}>
-            <Button size="sm" className="w-full">Get Started</Button>
+          <Link to={user ? "/dashboard" : "/register"} onClick={() => setOpen(false)}>
+            <Button size="sm" className="w-full">{user ? "Dashboard" : "Get Started"}</Button>
           </Link>
         </div>
       )}

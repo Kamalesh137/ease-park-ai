@@ -13,6 +13,7 @@ const navItems = [
   { label: "Analytics", icon: BarChart3, path: "/analytics" },
   { label: "Slot Management", icon: Settings, path: "/management" },
   { label: "My Account", icon: User, path: "/my-account" },
+  { label: "Settings", icon: Settings, path: "/settings" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -50,7 +51,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             const active = pathname === path;
             return (
               <Link
-                key={path}
+                key={path + label}
                 to={path}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(

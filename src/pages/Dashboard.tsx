@@ -1,10 +1,11 @@
-import { useMemo, useState, useEffect } from "react";
-import { Car, CarFront, CircleParking, TrendingUp, AlertTriangle, Zap } from "lucide-react";
+import { useMemo } from "react";
+import { Car, CarFront, CircleParking, Zap, AlertTriangle, TrendingUp, Clock, Activity } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import DashboardLayout from "@/components/DashboardLayout";
-import { generateSlots, type ParkingSlot, type SlotStatus, ZONES } from "@/data/mockData";
+import { useParkingData } from "@/hooks/useParkingData";
+import type { SlotStatus } from "@/data/mockData";
 
 const statusConfig: Record<SlotStatus, { color: string; label: string }> = {
   available: { color: "bg-accent", label: "Available" },
@@ -17,9 +18,9 @@ function StatCard({ icon: Icon, label, value, sub, accent }: {
   icon: React.ElementType; label: string; value: string | number; sub?: string; accent?: string;
 }) {
   return (
-    <Card className="shadow-card hover:shadow-card-hover transition-shadow">
+    <Card className="shadow-card hover:shadow-card-hover transition-all duration-300 group">
       <CardContent className="p-5 flex items-start gap-4">
-        <div className={cn("rounded-lg p-2.5", accent ?? "bg-primary/10")}>
+        <div className={cn("rounded-lg p-2.5 transition-colors", accent ?? "bg-primary/10", "group-hover:scale-110 transition-transform")}>
           <Icon className={cn("h-5 w-5", accent ? "text-primary-foreground" : "text-primary")} />
         </div>
         <div>
@@ -33,67 +34,73 @@ function StatCard({ icon: Icon, label, value, sub, accent }: {
 }
 
 export default function Dashboard() {
-  const [slots, setSlots] = useState<ParkingSlot[]>([]);
-  const [activeZone, setActiveZone] = useState<string>("all");
+  const { slots, stats } = useParkingData(5000);
 
-  useEffect(() => {
-    setSlots(generateSlots());
-    const interval = setInterval(() => setSlots(generateSlots()), 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const stats = useMemo(() => {
-    const total = slots.length;
-    const occupied = slots.filter((s) => s.status === "occupied").length;
-    const available = slots.filter((s) => s.status === "available").length;
-    const reserved = slots.filter((s) => s.status === "reserved").length;
-    return { total, occupied, available, reserved, rate: total ? Math.round((occupied / total) * 100) : 0 };
-  }, [slots]);
-
-  const filtered = activeZone === "all" ? slots : slots.filter((s) => s.zone === activeZone);
+  const filtered = slots;
 
   return (
     <DashboardLayout>
       <div className="space-y-6 animate-fade-up">
         {/* Stats row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-          <StatCard icon={CircleParking} label="Total Slots" value={stats.total} sub="Across all zones" />
-          <StatCard icon={Car} label="Occupied" value={stats.occupied} sub={`${stats.rate}% occupancy`} accent="bg-destructive" />
+          <StatCard icon={CircleParking} label="Total Slots" value={stats.totalSlots} sub="Across all zones" />
+          <StatCard icon={Car} label="Occupied" value={stats.occupied} sub={`${stats.occupancyRate}% occupancy`} accent="bg-destructive" />
           <StatCard icon={Zap} label="Available" value={stats.available} sub="Ready for parking" accent="bg-accent" />
           <StatCard icon={AlertTriangle} label="Reserved" value={stats.reserved} sub="Pre-booked slots" accent="bg-primary" />
         </div>
 
-        {/* Zone filter */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-muted-foreground mr-1">Zone:</span>
-          {["all", ...ZONES].map((z) => (
-            <button
-              key={z}
-              onClick={() => setActiveZone(z)}
-              className={cn(
-                "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                activeZone === z ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
-              )}
-            >
-              {z === "all" ? "All Zones" : `Zone ${z}`}
-            </button>
-          ))}
-
-          {/* Legend */}
-          <div className="ml-auto flex items-center gap-3 text-xs text-muted-foreground">
-            {Object.entries(statusConfig).map(([key, { color, label }]) => (
-              <span key={key} className="flex items-center gap-1.5">
-                <span className={cn("h-2.5 w-2.5 rounded-sm", color)} />
-                {label}
-              </span>
-            ))}
-          </div>
+        {/* Secondary stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <StatCard icon={Activity} label="Active Vehicles" value={stats.activeVehicles} sub="Currently parked" />
+          <StatCard icon={TrendingUp} label="Today's Entries" value={stats.todayEntries} sub="Vehicles entered today" />
+          <StatCard icon={Clock} label="Peak Hour" value={stats.peakHour} sub="Highest traffic time" />
         </div>
 
-        {/* Slot grid */}
+        {/* Floor availability */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base font-display">Live Parking Grid</CardTitle>
+            <CardTitle className="text-base font-display">Floor-wise Availability</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {stats.floors.map(f => (
+                <div key={f.floor} className="rounded-xl border p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="font-display font-semibold text-foreground">{f.label}</span>
+                    <Badge variant={f.available > 0 ? "default" : "destructive"} className="text-xs">
+                      {f.available} free
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-accent transition-all duration-1000"
+                      style={{ width: `${(f.available / f.total) * 100}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{f.occupied} occupied</span>
+                    <span>{f.total} total</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Legend + Grid */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base font-display">Live Parking Grid</CardTitle>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                {Object.entries(statusConfig).map(([key, { color, label }]) => (
+                  <span key={key} className="flex items-center gap-1.5">
+                    <span className={cn("h-2.5 w-2.5 rounded-sm", color)} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-[repeat(auto-fill,minmax(56px,1fr))] gap-2">
@@ -112,8 +119,6 @@ export default function Dashboard() {
                 >
                   <CarFront className="h-3.5 w-3.5 mb-0.5 opacity-80" />
                   <span>{slot.id}</span>
-
-                  {/* Tooltip on hover */}
                   {slot.vehiclePlate && (
                     <div className="absolute bottom-full mb-1 left-1/2 -translate-x-1/2 bg-card text-card-foreground border rounded-md px-2 py-1 text-[10px] shadow-card whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-10">
                       {slot.vehiclePlate}
