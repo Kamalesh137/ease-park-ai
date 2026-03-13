@@ -216,8 +216,11 @@ export default function ParkCar() {
               <CardTitle className="flex items-center gap-2 font-display"><Camera className="h-5 w-5 text-primary" />Capture Vehicle Image</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground flex items-center gap-3">
                 Assigned slot: <Badge variant="outline" className="ml-1">{assignedSlot}</Badge>
+                {predictionScore !== null && (
+                  <Badge className="bg-accent/20 text-accent-foreground gap-1"><TreeDeciduous className="h-3 w-3" />RF Score: {predictionScore}</Badge>
+                )}
               </div>
               <div className="relative bg-secondary rounded-xl overflow-hidden aspect-video flex items-center justify-center">
                 {capturedImage ? (
