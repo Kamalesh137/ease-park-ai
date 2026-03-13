@@ -27,6 +27,7 @@ export default function ParkCar() {
   const [selectedFloor, setSelectedFloor] = useState<number>(1);
   const [assignedSlot, setAssignedSlot] = useState<string | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [predictionScore, setPredictionScore] = useState<number | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [grid, setGrid] = useState<GridCell[][] | null>(null);
   const [path, setPath] = useState<{ row: number; col: number }[]>([]);
