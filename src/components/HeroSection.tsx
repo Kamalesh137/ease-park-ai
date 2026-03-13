@@ -21,12 +21,11 @@ const HeroSection = () => (
             Real-time vehicle detection, automated slot tracking, and intelligent analytics — powered by YOLO and deep learning models.
           </p>
           <div className="flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: "0.3s" }}>
-            <Button size="lg" className="gap-2">
-              Get Started <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              <Play className="h-4 w-4" /> Watch Demo
-            </Button>
+            <Link to="/register">
+              <Button size="lg" className="gap-2">
+                Get Started <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center gap-6 pt-4 text-sm text-muted-foreground animate-fade-up" style={{ animationDelay: "0.4s" }}>
             <span className="flex items-center gap-1.5"><span className="font-display font-bold text-2xl text-foreground">98%</span> Detection Accuracy</span>

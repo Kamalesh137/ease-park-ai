@@ -1,17 +1,4 @@
-// A* pathfinding for parking grid navigation
-
-interface Node {
-  row: number;
-  col: number;
-  g: number;
-  h: number;
-  f: number;
-  parent: Node | null;
-}
-
-function heuristic(a: { row: number; col: number }, b: { row: number; col: number }): number {
-  return Math.abs(a.row - b.row) + Math.abs(a.col - b.col);
-}
+// Dijkstra's shortest path algorithm for parking grid navigation
 
 export interface GridCell {
   row: number;
@@ -22,7 +9,6 @@ export interface GridCell {
 /**
  * Build a parking floor grid.
  * Layout: row 0 = entry lane, odd rows = parking slots, even rows = driving lanes.
- * The grid has (rows*2 + 1) actual rows and (cols + 2) actual cols for lanes.
  */
 export function buildFloorGrid(
   rows: number,
@@ -41,10 +27,8 @@ export function buildFloorGrid(
     const row: GridCell[] = [];
     for (let c = 0; c < gridCols; c++) {
       if (r === 0 || r % 2 === 0 || c === 0 || c === gridCols - 1) {
-        // Lanes
         row.push({ row: r, col: c, type: "lane" });
       } else {
-        // Parking slots
         const slotRow = Math.floor((r - 1) / 2);
         const slotCol = c - 1;
         const slotId = `F${floor}-${String.fromCharCode(65 + slotRow)}${slotCol + 1}`;
@@ -61,11 +45,9 @@ export function buildFloorGrid(
         }
       }
     }
-    row[row.length] // noop
     grid.push(row);
   }
 
-  // Entry point: middle of top lane
   const entry = { row: 0, col: Math.floor(gridCols / 2) };
   grid[entry.row][entry.col].type = "entry";
 
@@ -73,8 +55,8 @@ export function buildFloorGrid(
 }
 
 /**
- * A* algorithm to find shortest path on the grid.
- * Can only walk on "lane", "entry", "target", and the immediate neighbor of "target".
+ * Dijkstra's algorithm to find shortest path on the grid.
+ * All edge weights are 1 (uniform grid).
  */
 export function findPath(
   grid: GridCell[][],
@@ -90,52 +72,54 @@ export function findPath(
     return t === "lane" || t === "entry" || t === "target";
   }
 
-  const open: Node[] = [];
-  const closed = new Set<string>();
   const key = (r: number, c: number) => `${r},${c}`;
+  const dist = new Map<string, number>();
+  const prev = new Map<string, { row: number; col: number } | null>();
+  const visited = new Set<string>();
 
-  const startNode: Node = { row: start.row, col: start.col, g: 0, h: heuristic(start, end), f: 0, parent: null };
-  startNode.f = startNode.g + startNode.h;
-  open.push(startNode);
+  // Priority queue (simple array-based for grid scale)
+  const queue: { row: number; col: number; d: number }[] = [];
+
+  const startKey = key(start.row, start.col);
+  dist.set(startKey, 0);
+  prev.set(startKey, null);
+  queue.push({ row: start.row, col: start.col, d: 0 });
 
   const dirs = [
     [0, 1], [0, -1], [1, 0], [-1, 0],
   ];
 
-  while (open.length > 0) {
-    open.sort((a, b) => a.f - b.f);
-    const current = open.shift()!;
+  while (queue.length > 0) {
+    queue.sort((a, b) => a.d - b.d);
+    const current = queue.shift()!;
+    const ck = key(current.row, current.col);
+
+    if (visited.has(ck)) continue;
+    visited.add(ck);
 
     if (current.row === end.row && current.col === end.col) {
       // Reconstruct path
       const path: { row: number; col: number }[] = [];
-      let node: Node | null = current;
+      let node: { row: number; col: number } | null = { row: current.row, col: current.col };
       while (node) {
-        path.unshift({ row: node.row, col: node.col });
-        node = node.parent;
+        path.unshift(node);
+        node = prev.get(key(node.row, node.col)) ?? null;
       }
       return path;
     }
-
-    closed.add(key(current.row, current.col));
 
     for (const [dr, dc] of dirs) {
       const nr = current.row + dr;
       const nc = current.col + dc;
       if (!isWalkable(nr, nc)) continue;
-      if (closed.has(key(nr, nc))) continue;
+      const nk = key(nr, nc);
+      if (visited.has(nk)) continue;
 
-      const g = current.g + 1;
-      const existing = open.find((n) => n.row === nr && n.col === nc);
-      if (existing) {
-        if (g < existing.g) {
-          existing.g = g;
-          existing.f = g + existing.h;
-          existing.parent = current;
-        }
-      } else {
-        const h = heuristic({ row: nr, col: nc }, end);
-        open.push({ row: nr, col: nc, g, h, f: g + h, parent: current });
+      const newDist = current.d + 1;
+      if (!dist.has(nk) || newDist < dist.get(nk)!) {
+        dist.set(nk, newDist);
+        prev.set(nk, { row: current.row, col: current.col });
+        queue.push({ row: nr, col: nc, d: newDist });
       }
     }
   }

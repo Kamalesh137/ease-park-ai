@@ -1,12 +1,12 @@
-import { Camera, Brain, BarChart3, Shield, Zap, Database } from "lucide-react";
+import { TreeDeciduous, BarChart3, Shield, Zap, Database, Navigation } from "lucide-react";
 
 const features = [
-  { icon: Camera, title: "CCTV Integration", desc: "Connect any IP camera or CCTV feed for real-time parking lot monitoring." },
-  { icon: Brain, title: "YOLO Detection", desc: "State-of-the-art YOLOv8 model detects vehicles with 98% accuracy in real-time." },
+  { icon: TreeDeciduous, title: "Random Forest Slot Allocation", desc: "ML-powered slot prediction considers vehicle size, type, dimensions, occupancy, and distance to assign the optimal parking spot." },
   { icon: BarChart3, title: "Analytics Dashboard", desc: "Track occupancy trends, peak hours, and revenue with interactive charts." },
+  { icon: Navigation, title: "Smart Path Navigation", desc: "Dijkstra's shortest path algorithm guides vehicles from the entry gate to their assigned slot." },
   { icon: Zap, title: "Real-Time Tracking", desc: "Vehicle entry/exit tracking with automatic license plate recognition." },
-  { icon: Database, title: "Data Management", desc: "SQLite/PostgreSQL database stores all parking records and logs." },
-  { icon: Shield, title: "Secure & Scalable", desc: "REST API architecture with Flask/FastAPI, ready for production deployment." },
+  { icon: Database, title: "Data Management", desc: "Persistent database stores all parking records, user accounts, and session logs." },
+  { icon: Shield, title: "Secure & Scalable", desc: "Modular architecture with separate account, parking, navigation, and capture modules." },
 ];
 
 const FeaturesSection = () => (
