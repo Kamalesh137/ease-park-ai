@@ -15,10 +15,10 @@ const HeroSection = () => (
           </div>
           <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold leading-tight animate-fade-up" style={{ animationDelay: "0.1s" }}>
             Smart Parking with{" "}
-            <span className="text-gradient">Computer Vision</span>
+            <span className="text-gradient">Machine Learning</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-lg animate-fade-up" style={{ animationDelay: "0.2s" }}>
-            Real-time vehicle detection, automated slot tracking, and intelligent analytics — powered by YOLO and deep learning models.
+            Intelligent slot prediction, automated parking allocation, and smart analytics — powered by Random Forest ML and Dijkstra's navigation.
           </p>
           <div className="flex flex-wrap gap-3 animate-fade-up" style={{ animationDelay: "0.3s" }}>
             <Link to="/register">
