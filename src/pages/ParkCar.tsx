@@ -1,17 +1,17 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, CarFront, MapPin, Navigation, CheckCircle2 } from "lucide-react";
+import { Camera, CarFront, MapPin, Navigation, CheckCircle2, TreeDeciduous } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import DashboardLayout from "@/components/DashboardLayout";
 import {
-  getCurrentUser, FLOORS, findAvailableSlot,
+  getCurrentUser, FLOORS,
   getOccupiedSlots, createSession, saveImage,
 } from "@/data/userStore";
 import { buildFloorGrid, findPath, type GridCell } from "@/lib/pathfinding";
+import { predictBestSlot } from "@/lib/randomForestSlotPredictor";
 import { cn } from "@/lib/utils";
 
 type Step = "floor" | "capture" | "navigate" | "done";
