@@ -13,6 +13,7 @@ import Register from "./pages/Register.tsx";
 import ParkCar from "./pages/ParkCar.tsx";
 import MyAccount from "./pages/MyAccount.tsx";
 import MySessions from "./pages/MySessions.tsx";
+import Settings from "./pages/Settings.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/logs" element={<VehicleLogs />} />
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/management" element={<SlotManagement />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
