@@ -204,7 +204,7 @@ export default function ParkCar() {
                   </button>
                 ))}
               </div>
-              <Button onClick={handleSelectFloor} className="w-full gap-2"><CarFront className="h-4 w-4" />Assign Slot on {FLOORS.find((f) => f.floor === selectedFloor)?.label}</Button>
+              <Button onClick={handleSelectFloor} className="w-full gap-2"><TreeDeciduous className="h-4 w-4" />Predict Best Slot on {FLOORS.find((f) => f.floor === selectedFloor)?.label}</Button>
             </CardContent>
           </Card>
         )}
